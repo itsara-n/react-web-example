@@ -136,3 +136,33 @@ const deleteProductAPI = (token, id = '') => {
     return response.status
   })
 }
+
+
+/**
+ * Action for update product
+ */
+export const updateProduct = (data, id) => async (dispatch, getState) => {  
+  const token = await getState().token;
+  const jsonBody = JSON.stringify(data)
+  const status = await putUpdateProductAPI(token, jsonBody, id)
+  if (status === 200) {
+    dispatch(getProductsList())
+  }
+}
+const putUpdateProductAPI = (token, body, id) => {
+  console.log(body);
+  console.log(id);
+  
+  
+  return fetch('https://cors-anywhere.herokuapp.com/' + 'https://nodejs-api-example.herokuapp.com/product/' + id, {
+    credentials: 'same-origin',
+    method: 'PUT',
+    body,
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': token
+    })
+  }).then(response => {
+    return response.status
+  })
+}
