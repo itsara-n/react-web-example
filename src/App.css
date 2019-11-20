@@ -1,8 +1,7 @@
 .App {
   flex: 1;
   margin: 0px;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
 .Header {
@@ -104,4 +103,17 @@
   float: none; /* Added */
   margin-top: 20px;
   margin-bottom: 20px; /* Added */
+}
+
+#productForm {
+  padding: 20px;
+  padding-bottom: ;
+}
+
+.renderProductsList {
+  margin-top: 100px;
+}
+
+#productImage {
+  border: 1px solid #d4d4d4;
 }

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 
 /**
  * Action for login admin
@@ -61,7 +62,7 @@ export const getProductsList = () => async (dispatch, getState) => {
   const data = await getProductsAPI()
   dispatch({
     type: 'GET_PRODUCTS_SUCCESS',
-    list: data
+    list: data.reverse()
   })
 }
 /**
@@ -74,5 +75,64 @@ const getProductsAPI = () => {
     headers: new Headers({ 'Content-Type': 'application/json' })
   }).then(response => {
     return response.json().then(data => data)
+  })
+}
+
+
+/**
+ * Action for create new product
+ */
+export const createProduct = (data) => async (dispatch, getState) => {
+  dispatch({ type: 'CREATE_PRODUCT_REQUEST' })
+  const token = await getState().token;
+  const jsonBody = JSON.stringify(data)
+  const status = await postNewProductAPI(token, jsonBody)
+  if (status === 201) {
+    dispatch({ type: 'CREATE_PRODUCT_SUCCESS' })
+    dispatch(getProductsList())
+  } else {
+    dispatch({ type: 'CREATE_PRODUCT_FAILURE', error: 'Can not creat new product' })
+  }
+}
+/**
+ * Call API create product
+ * @param {string} token 
+ * @param {json} body 
+ */
+const postNewProductAPI = (token, body) => {
+  return fetch('https://cors-anywhere.herokuapp.com/' + 'https://nodejs-api-example.herokuapp.com/product', {
+    credentials: 'same-origin',
+    method: 'POST',
+    body,
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': token
+    })
+  }).then(response => {
+    return response.status
+  })
+}
+
+
+/**
+ * Action for delete product
+ */
+export const deleteProduct = (id) => async (dispatch, getState) => {
+  const token = await getState().token;
+  const status = await deleteProductAPI(token, id)
+  if (status === 204) {
+    dispatch(getProductsList())
+  }
+}
+const deleteProductAPI = (token, id = '') => {
+  return fetch('https://cors-anywhere.herokuapp.com/' + 'https://nodejs-api-example.herokuapp.com/product/' + id, {
+    credentials: 'same-origin',
+    method: 'DELETE',
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': token
+    })
+  }).then(response => {
+    return response.status
   })
 }

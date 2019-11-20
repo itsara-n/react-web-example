@@ -39,13 +39,30 @@ const reducers = (state = initialState, action) => {
     case 'GET_PRODUCTS_REQUEST':
       return {
         ...state,
-        loadin: true,
+        loading: true,
       }
     case 'GET_PRODUCTS_SUCCESS':
       return {
         ...state,
         loading: false,
         products: action.list,
+      }
+
+    case 'CREATE_PRODUCT_REQUEST':
+      return {
+        ...state,
+        loading: true,
+      }
+    case 'CREATE_PRODUCT_SUCCESS':
+      return {
+        ...state,
+        loading: false,
+      }
+    case 'CREATE_PRODUCT_FAILURE':
+      return {
+        ...state,
+        error: action.error,
+        loading: false,
       }
 
     default:

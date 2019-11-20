@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Table, Form, Col, Row, Card, ListGroup } from 'react-bootstrap';
+import { Button, Table, Form, Container, Col, Row, Card, ListGroup, Spinner, Image } from 'react-bootstrap';
 import { connect } from 'react-redux'
-import { adminLogin, adminLogout, getProductsList } from './actionCreators'
+import _ from 'lodash'
+import { adminLogin, adminLogout, getProductsList, createProduct, deleteProduct } from './actionCreators'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -9,10 +10,18 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+
       showLoginForm: false,
       username: '',
       password: '',
+
       showNewProductForm: false,
+      name: '',
+      desc: '',
+      price: '',
+      image: '',
+      status: true,
+      isUpdate: false,
     };
   }
 
@@ -23,6 +32,20 @@ class App extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.props.token !== null && this.props.token !== prevProps.token) {
       this.setState({ showLoginForm: false })
+    }
+    if ((this.props.productsList.length > 0) && !_.isEqual(this.props.productsList, prevProps.productsList)) {
+      this.setState({
+        showLoginForm: false,
+        username: '',
+        password: '',
+        showNewProductForm: false,
+        name: '',
+        desc: '',
+        price: '',
+        image: '',
+        status: true,
+        isUpdate: false,
+      })
     }
   }
 
@@ -54,8 +77,58 @@ class App extends Component {
     this.setState({ password: e.target.value })
   }
 
-  onShowNewProduct = () => {
-    this.setState((state) => ({ showNewProductForm: !state.showNewProductForm }))
+  onShowNewProduct = (product = {}) => {
+    if (product) {
+      const { name, desc, price, image, status } = product
+      this.setState((state) => ({
+        showNewProductForm: !state.showNewProductForm,
+        name,
+        desc,
+        price,
+        image,
+        status,
+        isUpdate: true,
+      }))
+    } else {
+      this.setState((state) => ({
+        showNewProductForm: !state.showNewProductForm,
+        name: '',
+        desc: '',
+        price: '',
+        image: '',
+        status: true,
+      }))
+    }
+  }
+
+  onDeleteProduct = (id) => {
+    this.props.deleteProduct(id)
+  }
+
+  onChangeText = (e, key = '') => {
+    console.log(e.target.value)
+    const { value } = e.target
+    this.setState({ [key]: value })
+  }
+
+  onChangeCheck = (e) => {
+    const { checked } = e.target
+    this.setState({ status: checked })
+  }
+
+  onSubmitNewProduct = () => {
+    const { name, desc, price, image, status, isUpdate } = this.state
+    const data = {
+      name,
+      desc,
+      image,
+      price,
+      status
+    }
+    if (isUpdate) {
+      //
+    }
+    this.props.createProduct(data)
   }
 
   renderNewProduct = () => {
@@ -65,57 +138,59 @@ class App extends Component {
           <Card.Header>Administrator Login</Card.Header>
 
           <Form>
-            <Form.Group as={Row} controlId="formPlaintextEmail">
-              <Form.Label column sm="3">
-                Name
+            <div id="productForm">
+              <Form.Group as={Row} controlId="formPlaintextEmail">
+                <Form.Label column sm="3">
+                  Name
               </Form.Label>
-              <Col sm="9">
-                <Form.Control type="text" placeholder="" />
-              </Col>
-            </Form.Group>
+                <Col sm="9">
+                  <Form.Control type="text" placeholder="" value={this.state.name} onChange={(e) => this.onChangeText(e, 'name')} />
+                </Col>
+              </Form.Group>
 
-            <Form.Group as={Row} controlId="formPlaintextPassword">
-              <Form.Label column sm="3">
-                Description
+              <Form.Group as={Row} controlId="formPlaintextPassword">
+                <Form.Label column sm="3">
+                  Description
               </Form.Label>
-              <Col sm="9">
-                <Form.Control as="textarea" rows="3" />
-              </Col>
-            </Form.Group>
+                <Col sm="9">
+                  <Form.Control as="textarea" rows="3" value={this.state.desc} onChange={(e) => this.onChangeText(e, 'desc')} />
+                </Col>
+              </Form.Group>
 
-            <Form.Group as={Row} controlId="formPlaintextEmail">
-              <Form.Label column sm="3">
-                Price
+              <Form.Group as={Row} controlId="formPlaintextEmail">
+                <Form.Label column sm="3">
+                  Price
               </Form.Label>
-              <Col sm="9">
-                <Form.Control type="text" placeholder="" />
-              </Col>
-            </Form.Group>
+                <Col sm="9">
+                  <Form.Control type="text" placeholder="" value={this.state.price} onChange={(e) => this.onChangeText(e, 'price')} />
+                </Col>
+              </Form.Group>
 
-            <Form.Group as={Row} controlId="formPlaintextEmail">
-              <Form.Label column sm="3">
-                Image url
+              <Form.Group as={Row} controlId="formPlaintextEmail">
+                <Form.Label column sm="3">
+                  Image url
               </Form.Label>
-              <Col sm="9">
-                <Form.Control type="text" placeholder="" />
-              </Col>
-            </Form.Group>
+                <Col sm="9">
+                  <Form.Control type="text" placeholder="" value={this.state.image} onChange={(e) => this.onChangeText(e, 'image')} />
+                </Col>
+              </Form.Group>
 
-            <Form.Group as={Row} controlId="formPlaintextEmail">
-              <Form.Label column sm="3">
-                Status
+              <Form.Group as={Row} controlId="formPlaintextEmail">
+                <Form.Label column sm="3">
+                  Status
               </Form.Label>
-              <Col sm="9">
-                <Form.Check type="checkbox" label="Available" />
-              </Col>
-            </Form.Group>
+                <Col sm="9">
+                  <Form.Check type="checkbox" label="Available" checked={this.state.status} onChange={this.onChangeCheck} />
+                </Col>
+              </Form.Group>
 
-            <Button variant="success" onClick={() => { }} style={{ margin: 20 }}>
-              Save
+              <Button variant="success" onClick={this.onSubmitNewProduct} style={{ margin: 20 }}>
+                Save
             </Button>
-            <Button variant="primary" onClick={this.onShowNewProduct} style={{ margin: 20 }}>
-              Cancel
+              <Button variant="primary" onClick={this.onShowNewProduct} style={{ margin: 20 }}>
+                Cancel
             </Button>
+            </div>
           </Form>
         </Card>
       </div>
@@ -153,36 +228,51 @@ class App extends Component {
 
   renderProductsList = () => {
     return (
-      <div>
-        <Table responsive>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Price</th>
-              <th>Available</th>
-              {this.props.token && <th>Edit</th>}
-              {this.props.token && <th>Delete</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {
-              this.props.productsList.map((product, index) => {
-                return (
-                  <tr>
-                    <td>{index + 1}</td>
-                    <td>{product.name}</td>
-                    <td>Table cell</td>
-                    <td>Table cell</td>
-                    {this.props.token && <td>Table cell</td>}
-                    {this.props.token && <td>Table cell</td>}
-                  </tr>
-                )
-              })
-            }
-          </tbody>
-        </Table>
+      <div className="renderProductsList">
+        {
+          this.props.productsList.map(this.renderProduct)
+        }
       </div>
+    )
+  }
+
+  renderProduct = (product, index) => {
+    const { _id, name, desc, image, price, status } = product
+    const isAdmin = this.props.token !== null
+    const _price = (price && price !== '') ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ''
+
+    return (
+      <Card key={_id} style={{ maxWidth: 700 }}>
+        <Row>
+          <Col md={5}>
+            {
+              (image !== '')
+                ? <Image id="productImage" style={{ width: 240, height: 180, margin: 10, backgroundColor: 'silver' }} src={image} rounded />
+                : <div style={{ width: 240, height: 180, margin: 10, backgroundColor: 'silver', borderRadius: 4 }}></div>
+            }
+          </Col>
+          <Col style={{ padding: 20 }}>
+            <Row><h3>{name}</h3></Row>
+            <Row><p style={{ maxWidth: 360, overflow: 'hidden', textOverflow: 'ellipsis' }}>{desc}</p></Row>
+            <Row>
+              <Col><p style={{ color: '#FF7733' }}>Price: {_price}</p></Col>
+              <Col><p style={{ color: status ? '#7EDF46' : '#F7E833' }}>Product is {status ? 'Available' : 'Unavailable'}</p></Col>
+            </Row>
+            {
+              isAdmin && (
+                <Row>
+                  <Button variant="warning" onClick={() => this.onShowNewProduct(product)} style={{ margin: 20 }}>
+                    Update Product
+                  </Button>
+                  <Button variant="danger" onClick={() => this.onDeleteProduct(_id)} style={{ margin: 20 }}>
+                    Delete Product
+                  </Button>
+                </Row>
+              )
+            }
+          </Col>
+        </Row>
+      </Card>
     )
   }
 
@@ -212,23 +302,6 @@ class App extends Component {
         </Button>
       )
     }
-
-
-    // if (this.props.token !== null) {
-    //   if (this.state.showNewProductForm) {
-    //     NewProductButton = (
-    //       <Button id="createBtn" variant="primary" onClick={this.onShowNewProduct}>
-    //         Close
-    //       </Button>
-    //     )
-    //   } else {
-    //     NewProductButton = (
-    //       <Button id="createBtn" variant="success" onClick={this.onShowNewProduct}>
-    //         New Product
-    //       </Button>
-    //     )
-    //   }
-    // }
     return (
       <div>
         {NewProductButton}
@@ -240,34 +313,24 @@ class App extends Component {
   renderLoading = () => {
     return (
       <div className="Loading">
-        <h2>Loading...</h2>
+        <Spinner animation="border" variant="primary" />
       </div>
     )
   }
 
   render() {
     return (
-      <div className="App" scroll="no">
+      <div className="App">
         <div className="Header">
           <h1>Simple eCommerce</h1>
         </div>
         <div className="Content">
-          {
-            this.renderAdminButton()
-          }
-          {
-            this.state.showLoginForm && this.renderLogin()
-          }
-          {
-            this.state.showNewProductForm && this.renderNewProduct()
-          }
-          {
-            (!this.state.showLoginForm && !this.state.showNewProductForm) && this.renderProductsList()
-          }
+          {this.renderAdminButton()}
+          {this.state.showLoginForm && this.renderLogin()}
+          {this.state.showNewProductForm && this.renderNewProduct()}
+          {(!this.state.showLoginForm && !this.state.showNewProductForm) && this.renderProductsList()}
         </div>
-        {
-          this.props.loading && this.renderLoading()
-        }
+        {this.props.loading && this.renderLoading()}
       </div>
     );
   }
@@ -284,6 +347,8 @@ const mapDispatchToProps = ({
   adminLogin,
   adminLogout,
   getProductsList,
+  createProduct,
+  deleteProduct,
 })
 
 export default connect(
