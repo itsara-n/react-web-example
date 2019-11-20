@@ -1,0 +1,107 @@
+.App {
+  flex: 1;
+  margin: 0px;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.Header {
+  height: 70px;
+  background-color: #424242;
+  overflow: hidden;
+}
+
+.Header h1 {
+  text-align: center;
+  align-self: center;
+  margin-top: 10px;
+  color: whitesmoke;
+}
+
+.Content {
+  margin: 0px;
+  overflow: hidden;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  height: 100%;
+}
+
+.LoginForm {
+  margin: 0px;
+  overflow: hidden;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  height: 100%;
+}
+.LoginForm>#errorMessage {
+  color: red;
+}
+
+.card {
+  margin: 5px;
+  max-width: 500px;;
+  margin: 0 auto;
+  float: none; /* Added */
+  margin-top: 20px;
+  margin-bottom: 20px; /* Added */
+}
+
+.card-header {
+  color: #424242;
+  font-size: large;
+  font-weight: bold;
+}
+
+.Loading {
+  position: absolute;
+  z-index: 99;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  opacity: 0.75;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Loading>h2 {
+  color: white;
+  text-align: center;
+}
+
+#loginBtn {
+  float: right;
+  margin: 20px auto;
+  margin-right: 20px;
+}
+
+#createBtn {
+  float: left;
+  margin: 20px auto;
+  margin-left: 20px;
+}
+
+.NewProductForm {
+  margin: 0px;
+  overflow: hidden;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  height: 100%;
+}
+
+.NewProductForm.card {
+  margin: 5px;
+  max-width: 800px;
+  margin: 0 auto;
+  float: none; /* Added */
+  margin-top: 20px;
+  margin-bottom: 20px; /* Added */
+}
