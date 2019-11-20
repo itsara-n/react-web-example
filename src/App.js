@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Button, Table, Form, Container, Col, Row, Card, ListGroup, Spinner, Image } from 'react-bootstrap';
 import { connect } from 'react-redux'
 import _ from 'lodash'
-import { adminLogin, adminLogout, getProductsList, createProduct, deleteProduct } from './actionCreators'
+import { adminLogin, adminLogout, getProductsList, createProduct, deleteProduct, updateProduct } from './actionCreators'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -22,6 +22,7 @@ class App extends Component {
       image: '',
       status: true,
       isUpdate: false,
+      selectID: '',
     };
   }
 
@@ -45,6 +46,7 @@ class App extends Component {
         image: '',
         status: true,
         isUpdate: false,
+        selectID: '',
       })
     }
   }
@@ -77,8 +79,8 @@ class App extends Component {
     this.setState({ password: e.target.value })
   }
 
-  onShowNewProduct = (product = {}) => {
-    if (product) {
+  onShowNewProduct = (product = {}, id) => {
+    if (!_.isEmpty(product)) {
       const { name, desc, price, image, status } = product
       this.setState((state) => ({
         showNewProductForm: !state.showNewProductForm,
@@ -88,6 +90,7 @@ class App extends Component {
         image,
         status,
         isUpdate: true,
+        selectID: id,
       }))
     } else {
       this.setState((state) => ({
@@ -97,6 +100,8 @@ class App extends Component {
         price: '',
         image: '',
         status: true,
+        isUpdate: false,
+        selectID: '',
       }))
     }
   }
@@ -117,7 +122,7 @@ class App extends Component {
   }
 
   onSubmitNewProduct = () => {
-    const { name, desc, price, image, status, isUpdate } = this.state
+    const { name, desc, price, image, status, isUpdate, selectID } = this.state
     const data = {
       name,
       desc,
@@ -126,9 +131,10 @@ class App extends Component {
       status
     }
     if (isUpdate) {
-      //
+      this.props.updateProduct(data, selectID)
+    } else {
+      this.props.createProduct(data)
     }
-    this.props.createProduct(data)
   }
 
   renderNewProduct = () => {
@@ -261,7 +267,7 @@ class App extends Component {
             {
               isAdmin && (
                 <Row>
-                  <Button variant="warning" onClick={() => this.onShowNewProduct(product)} style={{ margin: 20 }}>
+                  <Button variant="warning" onClick={() => this.onShowNewProduct(product, _id)} style={{ margin: 20 }}>
                     Update Product
                   </Button>
                   <Button variant="danger" onClick={() => this.onDeleteProduct(_id)} style={{ margin: 20 }}>
@@ -349,6 +355,7 @@ const mapDispatchToProps = ({
   getProductsList,
   createProduct,
   deleteProduct,
+  updateProduct,
 })
 
 export default connect(
